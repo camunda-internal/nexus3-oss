@@ -70,6 +70,7 @@ mapping.setUserObjectClass(parsed_args.user_object_class)
 mapping.setUserIdAttribute(parsed_args.user_id_attribute)
 mapping.setUserRealNameAttribute(parsed_args.user_real_name_attribute)
 mapping.setEmailAddressAttribute(parsed_args.user_email_attribute)
+mapping.setUserPasswordAttribute(parsed_args.user_password_attribute)
 
 if (parsed_args.map_groups_as_roles) {
     mapping.setLdapGroupsAsRoles(true)

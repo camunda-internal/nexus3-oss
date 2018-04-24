@@ -18,6 +18,7 @@
       user_id_attribute: "{{ item.ldap_user_id_attribute }}"
       user_real_name_attribute: "{{ item.ldap_user_real_name_attribute }}"
       user_email_attribute: "{{ item.ldap_user_email_attribute }}"
+      user_password_attribute: "{{ item.ldap_user_password_attribute }}"
       map_groups_as_roles: "{{ item.ldap_map_groups_as_roles | default(false) }}"
       group_base_dn: "{{ item.ldap_group_base_dn | default('ou=groups') }}"
       group_object_class: "{{ item.ldap_group_object_class | default('groupOfNames') }}"
