@@ -1,12 +1,30 @@
+// hack to access methods from com.sonatype.nexus.ssl.plugin.internal.ui.TrustStoreComponent
+package com.sonatype.nexus.ssl.plugin.internal.ui
 
-import org.sonatype.nexus.ldap.persist.LdapConfigurationManager
-import org.sonatype.nexus.ldap.persist.entity.LdapConfiguration
-import org.sonatype.nexus.ldap.persist.entity.Connection
-import org.sonatype.nexus.ldap.persist.entity.Mapping
 import groovy.json.JsonSlurper
+import org.sonatype.nexus.ldap.persist.LdapConfigurationManager
+import org.sonatype.nexus.ldap.persist.entity.Connection
+import org.sonatype.nexus.ldap.persist.entity.LdapConfiguration
+import org.sonatype.nexus.ldap.persist.entity.Mapping
+import org.sonatype.nexus.ssl.CertificateUtil
+
+import java.security.cert.Certificate
 
 parsed_args = new JsonSlurper().parseText(args)
 
+
+if (parsed_args.use_trust_store) {
+  TrustStoreComponent trustStoreComponent = container.lookup(TrustStoreComponent.class.getName())
+  CertificateComponent certificateComponent = container.lookup(CertificateComponent.class.getName())
+
+  Certificate[] certificates = certificateComponent.retrieveCertificates(parsed_args.hostname, Integer.valueOf(parsed_args.port), parsed_args.protocol)
+  certificates.each {
+    if (!certificateComponent.isInTrustStore(it)) {
+      // add cert to truststore
+      trustStoreComponent.create(CertificateUtil.serializeCertificateInPEM(it))
+    }
+  }
+}
 
 def ldapConfigMgr = container.lookup(LdapConfigurationManager.class.getName());
 
@@ -37,6 +55,10 @@ connection.setSearchBase(parsed_args.search_base)
 connection.setConnectionTimeout(30)
 connection.setConnectionRetryDelay(300)
 connection.setMaxIncidentsCount(3)
+
+// handle custom certificates
+connection.setUseTrustStore(parsed_args.use_trust_store)
+
 ldapConfig.setConnection(connection)
 
 
