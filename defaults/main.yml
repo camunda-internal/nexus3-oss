@@ -32,6 +32,7 @@ nexus_backup_keep_rotations: 4  # Keep 4 backup rotation by default (current + l
 # run ansible-playbook example.yml -e "purge=true"
 
 # Nexus default properties
+nexus_default_host: http://localhost
 nexus_default_port: 8081
 nexus_docker_hosted_port: 9080
 nexus_docker_proxy_port: 9081
