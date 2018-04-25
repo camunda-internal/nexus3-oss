@@ -1,9 +1,9 @@
 - name: Get rest API endpoint (v < 3.8.0)
   set_fact:
     nexus_rest_api_endpoint: "service/siesta/rest/v1/script"
-  when: nexus_version < '3.8.0'
+  when: nexus_version is version_compare('3.8.0', '<')
 
 - name: Get rest API endpoint (v >= 3.8.0)
   set_fact:
     nexus_rest_api_endpoint: "service/rest/v1/script"
-  when: nexus_version >='3.8.0'
+  when: nexus_version is version_compare('3.8.0', '>=')
