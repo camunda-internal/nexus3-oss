@@ -146,6 +146,14 @@
         footerEnabled: "{{ nexus_branding_footer != '' }}"
         headerEnabled: "{{ nexus_branding_header != '' }}"
 
+- name: Configure audit capability
+  include: call_script.yml
+  vars:
+    script_name: setup_capability
+    args:
+      capability_typeId: "audit"
+  when: nexus_capability_audit_enable
+
 - include: create_task_each.yml
   with_items: "{{ nexus_scheduled_tasks }}"
 
