@@ -18,6 +18,8 @@
 
 - include: nexus_install.yml
 
+- include: nexus_config.yml
+
 - include: httpd_reverse_proxy_config.yml
   when: httpd_setup_enable and nexus_install_enable
 
