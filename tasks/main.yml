@@ -1,19 +1,19 @@
 ---
 - block:
-  - name: Include OS specific variables.
-    include_vars: "configure-{{ ansible_os_family }}.yml"
+    - name: Include OS specific variables.
+      include_vars: "configure-{{ ansible_os_family }}.yml"
 
-  - name: Include OS specific selinux libs and utils if needed
-    include: "selinux-{{ ansible_os_family }}.yml"
-    when: ansible_selinux.status is defined and ansible_selinux.status == "enabled"
+    - name: Include OS specific selinux libs and utils if needed
+      include: "selinux-{{ ansible_os_family }}.yml"
+      when: ansible_selinux.status is defined and ansible_selinux.status == "enabled"
 
-  - name: Check if SystemD service is installed
-    stat:
-      path: /etc/systemd/system/nexus.service
-    register: nexus_systemd_service_file
+    - name: Check if SystemD service is installed
+      stat:
+        path: /etc/systemd/system/nexus.service
+      register: nexus_systemd_service_file
 
-  - include: nexus_purge.yml
-    when: ((purge is defined) and (purge | bool))
+    - include: nexus_purge.yml
+      when: ((purge is defined) and (purge | bool))
   when: nexus_install_enable
 
 - include: nexus_install.yml
@@ -75,14 +75,16 @@
   include: nexus-restore.yml
   when: nexus_restore_point is defined and nexus_install_enable
 
-- include: create_repo_maven_proxy_each.yml
-  with_items: "{{ nexus_repos_maven_proxy }}"
+- block:
+    - include: create_repo_maven_proxy_each.yml
+      with_items: "{{ nexus_repos_maven_proxy }}"
 
-- include: create_repo_maven_hosted_each.yml
-  with_items: "{{ nexus_repos_maven_hosted }}"
+    - include: create_repo_maven_hosted_each.yml
+      with_items: "{{ nexus_repos_maven_hosted }}"
 
-- include: create_repo_maven_group_each.yml
-  with_items: "{{ nexus_repos_maven_group }}"
+    - include: create_repo_maven_group_each.yml
+      with_items: "{{ nexus_repos_maven_group }}"
+  when: nexus_config_maven
 
 - block:
     - include: create_repo_docker_hosted_each.yml
