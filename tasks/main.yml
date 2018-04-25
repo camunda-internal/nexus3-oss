@@ -1,24 +1,25 @@
 ---
+- block:
+  - name: Include OS specific variables.
+    include_vars: "configure-{{ ansible_os_family }}.yml"
 
-- name: Include OS specific variables.
-  include_vars: "configure-{{ ansible_os_family }}.yml"
+  - name: Include OS specific selinux libs and utils if needed
+    include: "selinux-{{ ansible_os_family }}.yml"
+    when: ansible_selinux.status is defined and ansible_selinux.status == "enabled"
 
-- name: Include OS specific selinux libs and utils if needed
-  include: "selinux-{{ ansible_os_family }}.yml"
-  when: ansible_selinux.status is defined and ansible_selinux.status == "enabled"
+  - name: Check if SystemD service is installed
+    stat:
+      path: /etc/systemd/system/nexus.service
+    register: nexus_systemd_service_file
 
-- name: Check if SystemD service is installed
-  stat:
-    path: /etc/systemd/system/nexus.service
-  register: nexus_systemd_service_file
-
-- include: nexus_purge.yml
-  when: ((purge is defined) and (purge | bool))
+  - include: nexus_purge.yml
+    when: ((purge is defined) and (purge | bool))
+  when: nexus_install_enable
 
 - include: nexus_install.yml
 
 - include: httpd_reverse_proxy_config.yml
-  when: httpd_setup_enable
+  when: httpd_setup_enable and nexus_install_enable
 
 - include: admin_password_setup.yml
 
@@ -32,7 +33,7 @@
     - nuget-group
     - nuget-hosted
     - nuget.org-proxy
-  when: nexus_data_dir_contents.stdout == "" and nexus_delete_default_repos
+  when: (nexus_install_enable or (nexus_data_dir_contents is defined and nexus_data_dir_contents.stdout == "")) and nexus_delete_default_repos
 
 - name: Deleting default blobstore
   include: delete_blobstore_each.yml
@@ -48,7 +49,7 @@
     - name: "{{ nexus_blob_names.mvn.blob }}"
     - name: "{{ nexus_blob_names.gitlfs.blob }}"
     - name: "{{ nexus_blob_names.yum.blob }}"
-  when: nexus_data_dir_contents.stdout == "" and nexus_delete_default_blobstore
+  when: (nexus_install_enable or (nexus_data_dir_contents is defined and nexus_data_dir_contents.stdout == ""))  and nexus_delete_default_blobstore
 
 - include: setup_ldap_each.yml
   with_items: "{{ ldap_connections }}"
@@ -72,7 +73,7 @@
 
 - name: "Restore nexus backup"
   include: nexus-restore.yml
-  when: nexus_restore_point is defined
+  when: nexus_restore_point is defined and nexus_install_enable
 
 - include: create_repo_maven_proxy_each.yml
   with_items: "{{ nexus_repos_maven_proxy }}"

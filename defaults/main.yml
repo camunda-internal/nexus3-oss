@@ -1,5 +1,7 @@
 ---
 nexus_version: '3.9.0-01'
+
+nexus_install_enable: true
 nexus_package: "nexus-{{ nexus_version }}-unix.tar.gz"
 nexus_download_dir: '/tmp'
 nexus_os_group: 'nexus'
