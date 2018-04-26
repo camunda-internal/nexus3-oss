@@ -137,8 +137,8 @@ The fully qualified domain name under which the nexus instance will be accessibl
 
 ### Branding capabalities
 ```yaml
-    nexus_branding_header: ""
-    nexus_branding_footer: "Last provisionned {{ ansible_date_time.iso8601 }}"
+    nexus_capability_branding_header: ""
+    nexus_capability_branding_footer: "Last provisioned {{ ansible_date_time.iso8601 }}"
 ```
 
 Header and footer branding, those can contain HTML.
