@@ -1,5 +1,6 @@
 import groovy.json.JsonSlurper
 import org.sonatype.nexus.security.user.UserNotFoundException
+import org.sonatype.nexus.security.user.UserStatus
 
 parsed_args = new JsonSlurper().parseText(args)
 
@@ -9,6 +10,9 @@ try {
     user.setFirstName(parsed_args.first_name)
     user.setLastName(parsed_args.last_name)
     user.setEmailAddress(parsed_args.email)
+    if (parsed_args.status) {
+        user.setStatus(UserStatus.valueOf(parsed_args.status))
+    }
     security.securitySystem.updateUser(user)
     security.setUserRoles(parsed_args.username, parsed_args.roles)
     security.securitySystem.changePassword(parsed_args.username, parsed_args.password)
