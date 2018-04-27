@@ -2,7 +2,7 @@
 - name: Calling Groovy script {{ script_name }}
   uri:
     url: "{{ nexus_default_host }}:{{ nexus_default_port }}{{ nexus_default_context_path }}{{ nexus_rest_api_endpoint }}/{{ script_name }}/run"
-    user: 'admin'
+    user: "{{ current_nexus_admin_user }}"
     password: "{{ current_nexus_admin_password }}"
     headers:
       Content-Type: "text/plain"

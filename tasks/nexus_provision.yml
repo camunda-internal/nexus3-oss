@@ -1,5 +1,5 @@
 ---
-- name: Check first-time install admin password
+- name: Check first-time install admin user and password
   uri:
     url: "{{ nexus_default_host }}:{{ nexus_default_port }}{{ nexus_default_context_path }}{{ nexus_rest_api_endpoint }}"
     user: 'admin'
@@ -8,26 +8,37 @@
     status_code: 200, 401
   register: first_time_install
 
-- name: First-time install admin password
-  set_fact:
-    current_nexus_admin_password: 'admin123'
+- block:
+  - name: First-time install admin user
+    set_fact:
+      current_nexus_admin_user: 'admin'
+
+  - name: First-time install admin password
+    set_fact:
+      current_nexus_admin_password: 'admin123'
   when: first_time_install.status == 200
 
 - name: Check install admin password
   uri:
     url: "{{ nexus_default_host }}:{{ nexus_default_port }}{{ nexus_default_context_path }}{{ nexus_rest_api_endpoint }}"
-    user: 'admin'
+    user: "{{ nexus_admin_user }}"
     password: "{{ nexus_admin_password }}"
     force_basic_auth: yes
     status_code: 200
   register: already_installed
   when: first_time_install.status == 401
 
-- name: Subsequent re-provision admin password
-  set_fact:
-    current_nexus_admin_password: "{{ nexus_admin_password }}"
+- block:
+  - name: Set admin user
+    set_fact:
+      current_nexus_admin_user: "{{ nexus_admin_user }}"
+    when: (already_installed is defined) and (already_installed.status is defined and already_installed.status == 200)
+
+  - name: Subsequent re-provision admin password
+    set_fact:
+      current_nexus_admin_password: "{{ nexus_admin_password }}"
+    no_log: true
   when: (already_installed is defined) and (already_installed.status is defined and already_installed.status == 200)
-  no_log: true
 
 - name: Create Nexus tmp directory to hold groovy scripts
   file:
