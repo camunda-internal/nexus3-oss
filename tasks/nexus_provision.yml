@@ -24,7 +24,7 @@
     user: "{{ nexus_admin_user }}"
     password: "{{ nexus_admin_password }}"
     force_basic_auth: yes
-    status_code: 200
+    status_code: 200, 401
   register: already_installed
   when: first_time_install.status == 401
 
