@@ -16,9 +16,17 @@
       when: ((purge is defined) and (purge | bool))
   when: nexus_install_enable
 
-- include: nexus_install.yml
+- name: Override nexus_data_dir when not using install functionality
+  set_fact:
+    nexus_data_dir: "./tmp-ansible"
+  when: not nexus_install_enable
 
 - include: nexus_config.yml
+
+- include: nexus_install.yml
+  when: nexus_install_enable
+
+- include: nexus_provision.yml
 
 - include: httpd_reverse_proxy_config.yml
   when: httpd_setup_enable and nexus_install_enable
@@ -35,7 +43,7 @@
     - nuget-group
     - nuget-hosted
     - nuget.org-proxy
-  when: (nexus_install_enable or (nexus_data_dir_contents is defined and nexus_data_dir_contents.stdout == "")) and nexus_delete_default_repos
+  when: nexus_delete_default_repos and (nexus_install_enable or (nexus_data_dir_contents is defined and nexus_data_dir_contents.stdout == ""))
 
 - name: Deleting default blobstore
   include: delete_blobstore_each.yml
@@ -51,7 +59,7 @@
     - name: "{{ nexus_blob_names.mvn.blob }}"
     - name: "{{ nexus_blob_names.gitlfs.blob }}"
     - name: "{{ nexus_blob_names.yum.blob }}"
-  when: (nexus_install_enable or (nexus_data_dir_contents is defined and nexus_data_dir_contents.stdout == ""))  and nexus_delete_default_blobstore
+  when: nexus_delete_default_blobstore and (nexus_install_enable or (nexus_data_dir_contents is defined and nexus_data_dir_contents.stdout == ""))
 
 - include: setup_ldap_each.yml
   with_items: "{{ ldap_connections }}"
@@ -106,6 +114,7 @@
       https_proxy_username: "{{ nexus_https_proxy_username }}"
       https_proxy_password: "{{ nexus_https_proxy_password }}"
       proxy_exclude_hosts: "{{ nexus_proxy_exclude_hosts }}"
+  when: nexus_with_http_proxy
 
 - include: call_script.yml
   vars:

@@ -24,8 +24,9 @@ DefaultCapabilityReference existing = capabilityRegistry.all.find { CapabilityRe
 }
 
 if (existing) {
+    def active = existing.isActive() ?: true
     log.info(parsed_args.capability_typeId + ' capability updated to: {}',
-        capabilityRegistry.update(existing.id(), existing.active, existing.notes(), parsed_args.capability_properties).toString()
+        capabilityRegistry.update(existing.id(), active, existing.notes(), parsed_args.capability_properties).toString()
     )
 }
 else {
