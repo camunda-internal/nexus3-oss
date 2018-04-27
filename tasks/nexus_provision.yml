@@ -40,19 +40,15 @@
     no_log: true
   when: (already_installed is defined) and (already_installed.status is defined and already_installed.status == 200)
 
-- name: Create Nexus tmp directory to hold groovy scripts
-  file:
-    path: "{{ nexus_data_dir }}/groovy-raw-scripts/current"
-    state: "directory"
-  when: not nexus_install_enable
+- fail:
+    msg: "Unable to provision Nexus because no valid admin account available."
+  when: current_nexus_admin_user is not defined and current_nexus_admin_password is not defined
 
 - name: Create directory to hold current groovy scripts for reference
   file:
     path: "{{ nexus_data_dir }}/groovy-raw-scripts/current"
     state: directory
-    owner: root
-    group: root
-  when: nexus_install_enable
+  when: not nexus_install_enable
 
 - name: Upload new scripts
   synchronize:

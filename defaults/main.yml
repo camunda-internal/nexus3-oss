@@ -43,6 +43,7 @@ nexus_default_context_path: '/'
 
 nexus_admin_user: 'admin' # Specify your admin user here. This is only necessary for
 nexus_admin_password: 'changeme'  # Note : admin password change subsequent to first-time install is *not implemented* yet
+nexus_disable_default_admin_user: false
 nexus_anonymous_access: false
 
 public_hostname: 'nexus.vm'

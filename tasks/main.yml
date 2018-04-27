@@ -179,3 +179,9 @@
         language: groovy
         source: "{{ lookup('template', './templates/backup.groovy.j2') }}"
   when: nexus_backup_configure | bool
+
+- include: call_script.yml
+  vars:
+    script_name: disable_default_admin_user
+    args: "{}"
+  when: nexus_disable_default_admin_user
