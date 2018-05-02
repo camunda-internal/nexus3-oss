@@ -18,7 +18,7 @@
 
 - name: Override nexus_data_dir when not using install functionality
   set_fact:
-    nexus_data_dir: "./tmp-ansible"
+    nexus_data_dir: "/tmp/ansible-nexus3-oss"
   when: not nexus_install_enable
 
 - include: nexus_config.yml
