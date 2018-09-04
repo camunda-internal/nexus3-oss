@@ -1,4 +1,5 @@
 import groovy.json.JsonSlurper
+import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.config.Configuration
 
 parsed_args = new JsonSlurper().parseText(args)
@@ -11,7 +12,7 @@ authentication = parsed_args.remote_username == null ? null : [
         password: parsed_args.remote_password
 ]
 
-existingRepository = repositoryManager.get(parsed_args.name)
+Repository existingRepository = repositoryManager.get(parsed_args.name)
 
 if (existingRepository != null) {
 
@@ -20,8 +21,11 @@ if (existingRepository != null) {
     newConfig.attributes['maven']['versionPolicy'] = parsed_args.version_policy.toUpperCase()
     newConfig.attributes['maven']['layoutPolicy'] = parsed_args.layout_policy.toUpperCase()
     newConfig.attributes['proxy']['remoteUrl'] = parsed_args.remote_url
+    newConfig.attributes['proxy']['contentMaxAge'] = parsed_args.content_max_age
+    newConfig.attributes['proxy']['metadataMaxAge'] = parsed_args.metadata_max_age
     newConfig.attributes['httpclient']['authentication'] = authentication
     newConfig.attributes['storage']['strictContentTypeValidation'] = Boolean.valueOf(parsed_args.strict_content_validation)
+    newConfig.attributes['negativeCache']['timeToLive'] = parsed_args.time_to_live
 
     repositoryManager.update(newConfig)
 
@@ -38,8 +42,8 @@ if (existingRepository != null) {
                     ],
                     proxy  : [
                             remoteUrl: parsed_args.remote_url,
-                            contentMaxAge: 1440.0,
-                            metadataMaxAge: 1440.0
+                            contentMaxAge: parsed_args.content_max_age,
+                            metadataMaxAge: parsed_args.metadata_max_age
                     ],
                     httpclient: [
                             blocked: false,
@@ -55,7 +59,7 @@ if (existingRepository != null) {
                     ],
                     negativeCache: [
                             enabled: true,
-                            timeToLive: 1440.0
+                            timeToLive: parsed_args.time_to_live
                     ]
             ]
     )

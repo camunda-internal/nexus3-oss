@@ -218,6 +218,11 @@ _nexus_repos_maven_defaults:
   version_policy: release  # release, snapshot or mixed
   layout_policy: strict  # strict or permissive
   write_policy: allow_once  # one of "allow", "allow_once" or "deny"
+  content_max_age: 1440.0
+  metadata_max_age: 1440.0
+  time_to_live: 1440.0
+
+
 
 # also see _nexus_repos_maven_defaults below
 nexus_repos_maven_proxy:
